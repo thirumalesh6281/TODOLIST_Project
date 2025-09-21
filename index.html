@@ -1,0 +1,67 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To Do Lists</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="todo-container">
+    <h1>To Do Lists</h1>
+
+    <div class="search-bar">
+      <input type="text" id="taskInput" placeholder="Enter a new task">
+      <button onclick="addTask()">Add List</button>
+    </div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000"; // FastAPI backend
+
+    // Fetch all tasks
+    async function fetchTasks() {
+      const response = await fetch(`${API_URL}/tasks`);
+      const tasks = await response.json();
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${task.task}
+          <button class="delete-button" onclick="deleteTask(${task.id})">Delete</button>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    // Add a task
+    async function addTask() {
+      const input = document.getElementById("taskInput");
+      const task = input.value.trim();
+      if (task === "") return alert("Please enter a task");
+
+      await fetch(`${API_URL}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task: task })
+      });
+
+      input.value = "";
+      fetchTasks();
+    }
+
+    // Delete a task
+    async function deleteTask(id) {
+      await fetch(`${API_URL}/tasks/${id}`, { method: "DELETE" });
+      fetchTasks();
+    }
+
+    // Load tasks on page load
+    fetchTasks();
+  </script>
+</body>
+</html>
