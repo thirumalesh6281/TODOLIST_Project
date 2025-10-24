@@ -19,13 +19,14 @@ class Task(BaseModel):
 
 def get_db_connection():
     conn = snowflake.connector.connect(
-        user=os.getenv("SNOWFLAKE_USER"),
-        password=os.getenv("SNOWFLAKE_PASSWORD"),
-        account=os.getenv("SNOWFLAKE_ACCOUNT"),
-        warehouse='COMPUTE_WH',
-        database='TODO_APP',
-        schema='TODO_APP_S'
-    )
+    user='thirumal',
+    password='@Thirumalesh905',
+    account='gxa05082.east-us-2.azure',  # correct account string
+    warehouse='COMPUTE_WH',
+    database='TODO_APP',
+    schema='TODO_APP_S'
+)
+
     return conn
 
 @app.get("/tasks")
