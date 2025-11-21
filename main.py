@@ -19,14 +19,13 @@ class Task(BaseModel):
 
 def get_db_connection():
     conn = snowflake.connector.connect(
-    user='thirumal',
-    password='@Thirumalesh905',
-    account='gxa05082.east-us-2.azure',  # correct account string
-    warehouse='COMPUTE_WH',
-    database='TODO_APP',
-    schema='TODO_APP_S'
-)
-
+        user='thirumal',
+        password='@Thirumalesh905',
+        account='gxa05082.east-us-2.azure',
+        warehouse='COMPUTE_WH',
+        database='TODO_APP',
+        schema='TODO_APP_S'
+    )
     return conn
 
 @app.get("/tasks")
@@ -43,7 +42,10 @@ def get_tasks():
 def add_task(new_task: Task):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO TODOS (TASK) VALUES (?)", (new_task.task,))
+    
+    # FIXED: Snowflake uses %s, not ?
+    cursor.execute("INSERT INTO TODOS (TASK) VALUES (%s)", (new_task.task,))
+    
     conn.commit()
     cursor.close()
     conn.close()
@@ -53,7 +55,10 @@ def add_task(new_task: Task):
 def delete_task(task_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM TODOS WHERE ID = ?", (task_id,))
+
+    # FIXED: Snowflake uses %s, not ?
+    cursor.execute("DELETE FROM TODOS WHERE ID = %s", (task_id,))
+    
     conn.commit()
     cursor.close()
     conn.close()
